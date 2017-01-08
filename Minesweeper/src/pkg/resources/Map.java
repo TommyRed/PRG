@@ -1,6 +1,5 @@
 package pkg.resources;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -9,24 +8,26 @@ import java.util.stream.IntStream;
  */
 public class Map {
 
-    //    private final int size;
-//    private final int mines;
+    private final int mines;
     private final int[][] map;
 
-    public Map(int size, int mines) {
-//        this.size = size;
-//        this.mines = mines;
-        this.map = generate(size, mines);
+    public Map(int size, int mines, boolean shadowMap) {
+        this.mines = mines;
+        if (size <= 0 || mines <= 0) throw new IllegalArgumentException();
+        this.map = shadowMap ? generateShadowMap(size, mines) : generate(size);
     }
 
-    private int[][] generate(int size, int mines) {
-        return generateNumbers(generateMines(createMap(size), mines));
+    private int[][] generateShadowMap(int size, int mines) {
+        return generateNumbers(generateMines(createMap(size, 0), mines));
+    }
+    private int[][] generate(int size){
+        return createMap(size, -2);
     }
 
-    public int[][] createMap(int size) {
+    private int[][] createMap(int size, int field) {
         return IntStream.range(0, size)
                         .mapToObj(x -> IntStream.range(0, size)
-                                                .map(y -> 0)
+                                                .map(y -> field)
                                                 .toArray())
                         .toArray(int[][]::new);
     }
@@ -49,7 +50,6 @@ public class Map {
         map[x][y] = 9;
         return map;
     }
-
 
     // Numbers
     private int[][] generateNumbers(int[][] map) {
@@ -76,20 +76,16 @@ public class Map {
         return i;
     }
 
-
-//    public int getSize() {
-//        return size;
-//    }
-
-//    public int getMines() {
-//        return mines;
-//    }
-
+    // Essentials
     private int getIndex(int bound) {
         return new Random().nextInt(bound);
     }
 
     public int[][] getMap() {
         return map;
+    }
+
+    public int getMines() {
+        return mines;
     }
 }
